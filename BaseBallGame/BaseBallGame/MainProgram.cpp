@@ -4,16 +4,26 @@
 using namespace std;
 void InputNumber(int* num);
 int CheckSameNum(int* input, int* rand);
-void PrintResult(int same);
+void PrintResult(int same, int* teamVal, int* turn, int* round);
 
 int main() {
 	int randNum[3] = { 0,0,0 };
 	int inputNum[3] = { 0,0,0 };
 	int same = 0;
-
+	int team[2][4] = { 0 };//[2]:team1/team2 ,[4]:out/strike/lu/score
+	int turn = 0;
+	int round = 1;
 	srand((unsigned int)time(NULL));
 	//·£´ı ¼ıÀÚ »ı¼º
 	while (1) {
+		cout << "===========================" << endl;
+		cout << round << "È¸Â÷" << endl;
+		if (turn == 0) {
+			cout << "A ÆÀ" << endl;
+		}
+		else {
+			cout << "B ÆÀ" << endl;
+		}
 		for (int i = 0; i < 3; i++) {
 			randNum[i] = rand() % 10;
 		}
@@ -21,12 +31,19 @@ int main() {
 		InputNumber(inputNum);
 
 		system("cls");
+		cout << round << "È¸Â÷" << endl;
+		if (turn == 0) {
+			cout << "A ÆÀ" << endl;
+		}
+		else {
+			cout << "B ÆÀ" << endl;
+		}
 		//³ªÁß¿¡ ·£´ı ¼ıÀÚ ÁÖ¼® Ã³¸®!
 		cout << "·£´ı ¼ıÀÚ : " << randNum[0] << " " << randNum[1] << " " << randNum[2] << endl;
 		cout << "ÀÔ·ÂÇÑ ¼ıÀÚ : " << inputNum[0] << " " << inputNum[1] << " " << inputNum[2] << endl;
 		
 		same = CheckSameNum(inputNum, randNum);
-		PrintResult(same);
+		PrintResult(same, team[turn], &turn,&round);
 		same = 0;
 	}
 	system("pause");
@@ -71,20 +88,46 @@ int CheckSameNum(int* input, int* rand){
 	}
 	return same;
 }
-void PrintResult(int same) {
+void PrintResult(int same, int* teamVal, int* turn, int* round) {
 	switch (same)
 	{
 	case 0:
 		cout << "½ºÆ®¶óÀÌÅ©" << endl;
+		teamVal[1]++;
+		if (teamVal[1] == 3) {
+			teamVal[0]++;
+			cout << teamVal[0] << "¾Æ¿ô!" << endl;
+			teamVal[1] = 0;
+			if (teamVal[0] == 3) {
+				teamVal[0] = 0;
+				if (*turn == 0) {
+					*turn = 1;
+				}
+				else {
+					*turn = 0;
+					*round=(*round)+1;
+				}
+				cout <<"ÆÀ º¯°æ" << endl;
+			}
+		}
 		break;
 	case 1:
 		cout << "º¼" << endl;
 		break;
 	case 2:
 		cout << "¾ÈÅ¸" << endl;
+		teamVal[2]++;
+		if (teamVal[2] == 4) {
+			teamVal[3]++;
+			cout << "1Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
+			teamVal[2]--;
+		}
 		break;
 	case 3:
 		cout << "È¨·±" << endl;
+		teamVal[3] += teamVal[2] + 1;
+		cout << teamVal[2] + 1 << "Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
+		teamVal[2] = 0;
 		break;
 	default:
 		break;
