@@ -7,7 +7,7 @@ void InputNumber(int* num);
 int CheckSameNum(int* input, int* rand);
 void PrintResult(int same, int* teamVal, int* turn, int* round);
 void DrawGround(int i);
-int main() {
+int mainProgram() {
 	int randNum[3] = { 0,0,0 };
 	int inputNum[3] = { 0,0,0 };
 	int same = 0;
