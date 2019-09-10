@@ -1,23 +1,26 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <Windows.h>
 using namespace std;
 void InputNumber(int* num);
 int CheckSameNum(int* input, int* rand);
 void PrintResult(int same, int* teamVal, int* turn, int* round);
-
+void DrawGround(int i);
 int main() {
 	int randNum[3] = { 0,0,0 };
 	int inputNum[3] = { 0,0,0 };
 	int same = 0;
 	int team[2][4] = { 0 };//[2]:team1/team2 ,[4]:out/strike/lu/score
+	int score[2][9] = { 0 };//[2]:team1/team2, 9È¸Â÷±îÁöÀÇ Á¡¼ö ÀúÀå
+	int finalScore[2] = { 0 };
 	int turn = 0;
 	int round = 1;
 	srand((unsigned int)time(NULL));
 	//·£´ı ¼ıÀÚ »ı¼º
-	while (1) {
+	while (round<10) {
 		cout << "===========================" << endl;
-		cout << round << "È¸Â÷" << endl;
+		cout <<"["<< round << "È¸Â÷]" << endl;
 		if (turn == 0) {
 			cout << "A ÆÀ" << endl;
 		}
@@ -28,24 +31,66 @@ int main() {
 			randNum[i] = rand() % 10;
 		}
 		//¼ıÀÚ ÀÔ·Â
-		InputNumber(inputNum);
-
+		//InputNumber(inputNum);
+		for (int i = 0; i < 3; i++) {
+			inputNum[i] = rand() % 10;
+		}
 		system("cls");
-		cout << round << "È¸Â÷" << endl;
+		cout << "[" << round << "È¸Â÷]" << endl;
+		//È¸Â÷º° Á¡¼ö Ãâ·Â
+		cout << " ¦¢AÆÀ¦¢";
+		for (int i = 0; i < round; i++) {
+			cout.width(3);
+			cout.fill(' ');
+			cout <<score[0][i]<<"¦¢";
+		}
+		cout << "ÃÑÁ¡ ";
+		cout.width(4);
+		cout.fill(' ');
+		cout<< finalScore[0] << "¦¢" << endl;
+		cout << " ¦¢BÆÀ¦¢";
+		for (int i = 0; i < round; i++) {
+			cout.width(3);
+			cout.fill(' ');
+			cout <<  score[1][i] << "¦¢";
+		}
+		cout << "ÃÑÁ¡ ";
+		cout.width(4);
+		cout.fill(' ');
+		cout << finalScore[1] << "¦¢" << endl;
 		if (turn == 0) {
-			cout << "A ÆÀ" << endl;
+			cout << "A ÆÀ  " << team[0][0]<<"¾Æ¿ô"<<endl;
 		}
 		else {
-			cout << "B ÆÀ" << endl;
+			cout << "B ÆÀ  " << team[1][0] << "¾Æ¿ô"<< endl;
 		}
+		int saveTrun = turn;
+		int saveRound = round-1;
 		//³ªÁß¿¡ ·£´ı ¼ıÀÚ ÁÖ¼® Ã³¸®!
 		cout << "·£´ı ¼ıÀÚ : " << randNum[0] << " " << randNum[1] << " " << randNum[2] << endl;
 		cout << "ÀÔ·ÂÇÑ ¼ıÀÚ : " << inputNum[0] << " " << inputNum[1] << " " << inputNum[2] << endl;
-		
 		same = CheckSameNum(inputNum, randNum);
-		PrintResult(same, team[turn], &turn,&round);
+		PrintResult(same, team[turn], &turn, &round);
+		DrawGround(team[saveTrun][2]);
+		score[saveTrun][saveRound] = team[saveTrun][3];
+		if (saveTrun != turn) {
+			team[saveTrun][3] = 0;
+		}
+		finalScore[saveTrun] = 0;
+		for (int i = 0; i <= saveRound; i++) {
+			finalScore[saveTrun] += score[saveTrun][i];
+		}
 		same = 0;
 	}
+
+	cout << "°ÔÀÓ Á¾·á!" << endl;
+	if (finalScore[0] > finalScore[1]) {
+		cout << "AÆÀ ½Â¸®!" << endl;
+	}
+	else {
+		cout << "BÆÀ ½Â¸®!" << endl;
+	}
+
 	system("pause");
 	return 0;
 }
@@ -89,14 +134,15 @@ int CheckSameNum(int* input, int* rand){
 	return same;
 }
 void PrintResult(int same, int* teamVal, int* turn, int* round) {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 	switch (same)
 	{
 	case 0:
-		cout << "½ºÆ®¶óÀÌÅ©" << endl;
+		cout << "     ½ºÆ®¶óÀÌÅ©" << endl;
 		teamVal[1]++;
 		if (teamVal[1] == 3) {
 			teamVal[0]++;
-			cout << teamVal[0] << "¾Æ¿ô!" << endl;
+			cout <<"     "<< teamVal[0] << " ¾Æ¿ô!" << endl;
 			teamVal[1] = 0;
 			if (teamVal[0] == 3) {
 				teamVal[0] = 0;
@@ -107,29 +153,59 @@ void PrintResult(int same, int* teamVal, int* turn, int* round) {
 					*turn = 0;
 					*round=(*round)+1;
 				}
-				cout <<"ÆÀ º¯°æ" << endl;
+				cout <<"     ÆÀ º¯°æ" << endl;
 			}
 		}
 		break;
 	case 1:
-		cout << "º¼" << endl;
+		cout << "     º¼" << endl;
 		break;
 	case 2:
-		cout << "¾ÈÅ¸" << endl;
+		cout << "     ¾ÈÅ¸" << endl;
 		teamVal[2]++;
 		if (teamVal[2] == 4) {
 			teamVal[3]++;
-			cout << "1Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
+			cout << "     1Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
 			teamVal[2]--;
 		}
 		break;
 	case 3:
-		cout << "È¨·±" << endl;
+		cout << "     È¨·±" << endl;
 		teamVal[3] += teamVal[2] + 1;
-		cout << teamVal[2] + 1 << "Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
+		cout << "     "<<teamVal[2] + 1 << "Á¡ È¹µæ!    " << "ÃÑÁ¡  : " << teamVal[3] << endl;
 		teamVal[2] = 0;
 		break;
 	default:
+		break;
+	}
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+}
+void DrawGround(int i) {
+	switch (i)
+	{
+	case 1:
+		cout << "  ¡Û¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¡Ü" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¡Û¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡£À" << endl;
+		break;
+	case 2:
+		cout << "  ¡Ü¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¡Ü" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¡Û¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡£À" << endl;
+		break;
+	case 3:
+		cout << "  ¡Ü¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¡Ü" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¡Ü¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡£À" << endl;
+		break;
+	default:
+		cout << "  ¡Û¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¡Û" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¦¢                ¦¢" << endl;
+		cout << "  ¡Û¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡£À" << endl;
 		break;
 	}
 }
