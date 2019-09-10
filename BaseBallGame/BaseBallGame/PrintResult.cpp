@@ -11,7 +11,7 @@ PrintResult::~PrintResult()
 {
 }
 
-void PrintResult::ReadJsonData(const char str[])
+void PrintResult::ReadJsonData(const char str[], bool* clntTurn)
 {
 	Document d;
 	d.Parse(str);
@@ -30,9 +30,11 @@ void PrintResult::ReadJsonData(const char str[])
 	printf("ÃÑÁ¡ %5d¦¢\n", d["totalScoreServ"].GetInt());
 	//ÇöÀç ÆÀ Ãâ·Â
 	if (d["clntTurn"].GetBool()) {
+		*clntTurn = true;
 		printf("Client Team\n");
 	}
 	else {
+		*clntTurn = false;
 		printf("Server Team\n");
 	}
 	PrintLu(d["lu"].GetInt());

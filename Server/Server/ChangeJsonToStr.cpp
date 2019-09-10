@@ -1,6 +1,6 @@
 #include "ChangeJsonToStr.h"
 #include <rapidjson/writer.h>
-
+#include <stdlib.h>
 ChangeJsonToStr::ChangeJsonToStr()
 {
 	document.SetObject();
@@ -48,7 +48,11 @@ char * ChangeJsonToStr::GetHomerunStr(int getScore, int totalScore, int roundSco
 	document["lu"].SetInt(0);
 
 	document["result"].PushBack(Value().SetString("È¨·±!", document.GetAllocator()), document.GetAllocator());
-	document["result"].PushBack(Value().SetString(getScore + "Á¡ È¹µæ", document.GetAllocator()), document.GetAllocator());
+	char score[50],
+		next[] = "Á¡ È¹µæ";
+	_itoa(getScore,score,10);
+	strcat(score,next);
+	document["result"].PushBack(Value().SetString(score, document.GetAllocator()), document.GetAllocator());
 	document["clntTurn"].SetBool(false);
 	for (int i = 0; i < 3; i++) {
 		document["randNum"][i].SetInt(randNum[i]);

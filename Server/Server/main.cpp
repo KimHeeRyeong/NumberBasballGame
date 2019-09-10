@@ -5,6 +5,8 @@
 #include "CheckNumber.h"
 #include "ChangeJsonToStr.h"
 #include "PrintResult.h"
+#include <iostream>
+void InputNumber(int* num);
 void ErrorHandling(const char* errorMsg);
 int main() {
 	srand((unsigned int)time(NULL));
@@ -21,7 +23,7 @@ int main() {
 	SOCKADDR_IN servAddr, clntAddr;
 
 	int szClntAddr;
-	char message[] = "Hello!";
+	char message[500];
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		ErrorHandling("WSAStartup() error");
 	}
@@ -53,8 +55,17 @@ int main() {
 	playTeam = &tClnt;
 	while (round<9) {
 		//1)input num or recv num
-		for (int i = 0; i < 3; i++) {
-			inputNum[i] = rand() % 10;
+		if (clntTurn) {
+			memset(message, 0, sizeof(message));
+			recv(hClntSock, message, sizeof(message)-1, 0);
+			Document d;
+			d.Parse(message);
+			for (int i = 0; i < 3; i++) {
+				inputNum[i] = d[i].GetInt();
+			}
+		}
+		else {
+			InputNumber(inputNum);
 		}
 		//2)compare and getResult
 		Result result = randNum.CheckNum(inputNum);
@@ -80,20 +91,45 @@ int main() {
 				}
 				break;
 			}
-			break; 
-		}
-		case BALL:
-			break;
-		case HIT:
-			break;
-		case HOMERUN:
 			int getScore = playTeam->SetHomeRun();
-			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(), 
+			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
 				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
+			printResult.ReadJsonData(str);
 			free(str);
-			break;
+			break; 
+		}
+		case BALL: {
+			int getScore = playTeam->SetHomeRun();
+			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
+				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
+			int length = strlen(str) + 1;
+			send(hClntSock, str, length, 0);
+			printResult.ReadJsonData(str);
+			free(str);
+			break; 
+		}
+		case HIT: {
+			int getScore = playTeam->SetHomeRun();
+			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
+				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
+			int length = strlen(str) + 1;
+			send(hClntSock, str, length, 0);
+			printResult.ReadJsonData(str);
+			free(str);
+			break; 
+		}
+		case HOMERUN: {
+			int getScore = playTeam->SetHomeRun();
+			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
+				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
+			int length = strlen(str) + 1;
+			send(hClntSock, str, length, 0);
+			printResult.ReadJsonData(str);
+			free(str);
+			break; 
+		}
 		}
 	}
 	
@@ -108,4 +144,20 @@ void ErrorHandling(const char * errorMsg)
 	fputs(errorMsg, stderr);
 	fputc('\n', stderr);
 	exit(1);
+}
+void InputNumber(int* num) {
+	cout << "숫자를 입력해주세요(0~9, 중복 가능)" << endl;
+	for (int i = 0; i < 3; i++) {
+		cin >> num[i];
+		if (cin.fail()) {
+			cout << "숫자만 입력해주세요!" << endl;
+			cin.clear();
+			cin.ignore();
+			i--;
+		}
+		else if (num[i] > 9 || num[i] < 0) {
+			cout << "숫자의 범위는 0~9입니다!" << endl;
+			i--;
+		}
+	}
 }
