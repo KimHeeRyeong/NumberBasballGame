@@ -36,7 +36,7 @@ int main() {
 	if (hClntSock == INVALID_SOCKET) {
 		ErrorHandling("accept() error");
 	}
-
+	
 	send(hClntSock, message, sizeof(message), 0);
 	
 	closesocket(hClntSock);
