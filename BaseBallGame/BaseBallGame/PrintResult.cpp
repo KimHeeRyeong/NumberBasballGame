@@ -11,7 +11,7 @@ PrintResult::~PrintResult()
 {
 }
 
-void PrintResult::ReadJsonData(const char str[], bool* clntTurn)
+bool PrintResult::ReadJsonData(const char str[], bool* clntTurn)
 {
 	Document d;
 	d.Parse(str);
@@ -46,7 +46,11 @@ void PrintResult::ReadJsonData(const char str[], bool* clntTurn)
 	}
 	if (d["changeTurn"].GetBool()) {
 		*clntTurn = !(*clntTurn);
+		if (d["round"].GetInt() == 8 && *clntTurn) {
+			return true;
+		}
 	}
+	return false;
 }
 
 void PrintResult::PrintLu(int lu)

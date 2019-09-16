@@ -6,7 +6,7 @@ class PrintResult
 public:
 	PrintResult();
 	~PrintResult();
-	void ReadJsonData(const char str[], bool* clntTurn);
+	bool ReadJsonData(const char str[], bool* clntTurn);
 private:
 	void PrintLu(int lu);
 };

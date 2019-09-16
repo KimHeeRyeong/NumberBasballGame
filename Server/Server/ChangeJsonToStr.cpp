@@ -74,8 +74,7 @@ char * ChangeJsonToStr::GetHomerunStr(int getScore, int totalScore, int roundSco
 
 char * ChangeJsonToStr::GetStrikeStr(bool out, bool changeTurn, int randNum[], int inputNum[], int round, int lu)
 {
-	int preround = document["round"].GetInt();
-	if (document["roundScoreClnt"].GetArray().Size() == preround) {
+	if (document["roundScoreClnt"].GetArray().Size() == round) {
 		document["roundScoreClnt"].PushBack(Value().SetInt(0), document.GetAllocator());
 		document["roundScoreServ"].PushBack(Value().SetInt(0), document.GetAllocator());
 	}
@@ -102,6 +101,9 @@ char * ChangeJsonToStr::GetStrikeStr(bool out, bool changeTurn, int randNum[], i
 	if (changeTurn) {
 		bool save = document["clntTurn"].GetBool();
 		document["clntTurn"].SetBool(!save);
+		if (!save) {
+			document["round"].SetInt(round + 1);
+		}
 	}
 	return _strdup(buffer.GetString());
 }

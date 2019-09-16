@@ -75,9 +75,8 @@ int main() {
 			for (int i = 0; i < 3; i++) {
 				inputNum[i] = rand() % 10;
 			}
-			Sleep(100);
+			Sleep(10);
 		}
-		system("cls");
 		//2)compare and getResult
 		Result result = randNum.CheckNum(inputNum);
 		switch (result)
@@ -89,21 +88,18 @@ int main() {
 			switch (strikeState)
 			{
 			case STRIKE:
-				str = changeStr.GetStrikeStr(false, false, randNum.GetRandNum(), inputNum,0, playTeam->GetLu());
+				str = changeStr.GetStrikeStr(false, false, randNum.GetRandNum(), inputNum,round, playTeam->GetLu());
 				break;
 			case GAMEOUT:
-				printf("GAMEOUT");
-				str = changeStr.GetStrikeStr(true, false, randNum.GetRandNum(), inputNum,0, playTeam->GetLu());
+				str = changeStr.GetStrikeStr(true, false, randNum.GetRandNum(), inputNum,round, playTeam->GetLu());
 				break;
 			case TEAMCHANGE:
-				printf("TEAMCHANGE");
+				str = changeStr.GetStrikeStr(true, true, randNum.GetRandNum(), inputNum, round, playTeam->GetLu());
 				if(!clntTurn){
 					round++;
-					str = changeStr.GetStrikeStr(true, true, randNum.GetRandNum(), inputNum, round, playTeam->GetLu());
 					playTeam = &tClnt;
 					clntTurn = true;
 				}else{
-					str = changeStr.GetStrikeStr(true, true, randNum.GetRandNum(), inputNum, round, playTeam->GetLu());
 					playTeam = &tServ;
 					clntTurn = false;
 				}
@@ -111,6 +107,7 @@ int main() {
 			}
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
+			system("cls");
 			printResult.ReadJsonData(str);
 			free(str);
 			break; 
@@ -119,6 +116,7 @@ int main() {
 			char* str = changeStr.GetBallStr(clntTurn, randNum.GetRandNum(), inputNum, playTeam->GetLu());
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
+			system("cls");
 			printResult.ReadJsonData(str);
 			free(str);
 			break; 
@@ -128,6 +126,7 @@ int main() {
 			char* str = changeStr.GetHitStr(getScore, playTeam->GetTotalScore(), playTeam->GetLu(), clntTurn, randNum.GetRandNum(),inputNum);
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
+			system("cls");
 			printResult.ReadJsonData(str);
 			free(str);
 			break; 
@@ -138,13 +137,23 @@ int main() {
 				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
+			system("cls");
 			printResult.ReadJsonData(str);
 			free(str);
 			break; 
 		}
 		}
 	}
-	
+	memset(message, 0, sizeof(message));
+	if (tClnt.GetTotalScore() > tServ.GetTotalScore()) {
+		printf("\nwinner is client team\n");
+		strcpy(message, "winner is client team");
+	}
+	else {
+		printf("\nwinner is server team\n");
+		strcpy(message, "winner is server team");
+	}
+	send(hClntSock, message, strlen(message)+1, 0);
 	closesocket(hClntSock);
 	closesocket(hServSock);
 	WSACleanup();

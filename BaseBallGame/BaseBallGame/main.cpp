@@ -43,14 +43,14 @@ int main() {
 	if (connect(hSocket, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) {
 		ErrorHandling("connect() error");
 	}
-
-	while (round < 9) {
+	bool endGame = false;
+	while (!endGame) {
 		if (clntTurn) {
 			//InputNumber(inputNum);
 			for (int i = 0; i < 3; i++) {
 				inputNum[i] = rand() % 10;
 			}
-			Sleep(100);
+			Sleep(10);
 			for (int i = 0; i < 3; i++) {
 				sendDoc[i].SetInt(inputNum[i]);
 			}
@@ -67,8 +67,10 @@ int main() {
 		memset(message, 0, sizeof(message));
 		recv(hSocket, message, sizeof(message) - 1, 0);
 		system("cls");
-		printResult.ReadJsonData(message,&clntTurn);
+		endGame = printResult.ReadJsonData(message,&clntTurn);
 	}
+	recv(hSocket, message, sizeof(message), 0);
+	printf("\n%s\n", message);
 	closesocket(hSocket);
 	WSACleanup();
 	system("pause");
