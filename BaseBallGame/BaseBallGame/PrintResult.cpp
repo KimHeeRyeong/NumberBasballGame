@@ -44,6 +44,9 @@ void PrintResult::ReadJsonData(const char str[], bool* clntTurn)
 	for (auto& val : d["result"].GetArray()) {
 		printf("%s\n", val.GetString());
 	}
+	if (d["changeTurn"].GetBool()) {
+		*clntTurn = !(*clntTurn);
+	}
 }
 
 void PrintResult::PrintLu(int lu)

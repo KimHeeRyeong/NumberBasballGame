@@ -37,7 +37,7 @@ bool Team::SetHit()
 	if (lu == 4) {
 		roundScore++;
 		score++;
-		lu = 0;
+		lu = 3;
 		return true;
 	}
 	return false;
@@ -62,8 +62,14 @@ int Team::GetTotalScore()
 	return score;
 }
 
+int Team::GetLu()
+{
+	return lu;
+}
+
 void Team::ChangeTeam()
 {
+	strike = 0;
 	roundScore = 0;
 	out = 0;
 }

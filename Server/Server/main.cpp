@@ -60,13 +60,24 @@ int main() {
 			recv(hClntSock, message, sizeof(message)-1, 0);
 			Document d;
 			d.Parse(message);
-			for (int i = 0; i < 3; i++) {
-				inputNum[i] = d[i].GetInt();
+			if (d.IsArray()) {
+				for (int i = 0; i < 3; i++) {
+					inputNum[i] = d[i].GetInt();
+				}
 			}
+			else {
+				break;
+			}
+			d.Clear();
 		}
 		else {
-			InputNumber(inputNum);
+			//InputNumber(inputNum);
+			for (int i = 0; i < 3; i++) {
+				inputNum[i] = rand() % 10;
+			}
+			Sleep(100);
 		}
+		system("cls");
 		//2)compare and getResult
 		Result result = randNum.CheckNum(inputNum);
 		switch (result)
@@ -74,26 +85,30 @@ int main() {
 		case STR:
 		{
 			StrikeState strikeState = playTeam->SetStrike();
+			char* str = {0};
 			switch (strikeState)
 			{
 			case STRIKE:
+				str = changeStr.GetStrikeStr(false, false, randNum.GetRandNum(), inputNum,0, playTeam->GetLu());
 				break;
 			case GAMEOUT:
+				printf("GAMEOUT");
+				str = changeStr.GetStrikeStr(true, false, randNum.GetRandNum(), inputNum,0, playTeam->GetLu());
 				break;
 			case TEAMCHANGE:
+				printf("TEAMCHANGE");
 				if(!clntTurn){
 					round++;
+					str = changeStr.GetStrikeStr(true, true, randNum.GetRandNum(), inputNum, round, playTeam->GetLu());
 					playTeam = &tClnt;
 					clntTurn = true;
 				}else{
+					str = changeStr.GetStrikeStr(true, true, randNum.GetRandNum(), inputNum, round, playTeam->GetLu());
 					playTeam = &tServ;
 					clntTurn = false;
 				}
 				break;
 			}
-			int getScore = playTeam->SetHomeRun();
-			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
-				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
 			printResult.ReadJsonData(str);
@@ -101,9 +116,7 @@ int main() {
 			break; 
 		}
 		case BALL: {
-			int getScore = playTeam->SetHomeRun();
-			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
-				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
+			char* str = changeStr.GetBallStr(clntTurn, randNum.GetRandNum(), inputNum, playTeam->GetLu());
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
 			printResult.ReadJsonData(str);
@@ -111,9 +124,8 @@ int main() {
 			break; 
 		}
 		case HIT: {
-			int getScore = playTeam->SetHomeRun();
-			char* str = changeStr.GetHomerunStr(getScore, playTeam->GetTotalScore(),
-				playTeam->GetRoundScore(), clntTurn, randNum.GetRandNum(), inputNum);
+			bool getScore = playTeam->SetHit();
+			char* str = changeStr.GetHitStr(getScore, playTeam->GetTotalScore(), playTeam->GetLu(), clntTurn, randNum.GetRandNum(),inputNum);
 			int length = strlen(str) + 1;
 			send(hClntSock, str, length, 0);
 			printResult.ReadJsonData(str);

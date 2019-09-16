@@ -14,6 +14,7 @@ public:
 	int SetHomeRun();//È¹µæÇÑ Á¡¼ö ¹ÝÈ¯
 	int GetRoundScore();
 	int GetTotalScore();
+	int GetLu();
 private:
 	int strike;
 	int out;

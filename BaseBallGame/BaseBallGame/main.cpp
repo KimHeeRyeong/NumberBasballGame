@@ -46,7 +46,11 @@ int main() {
 
 	while (round < 9) {
 		if (clntTurn) {
-			InputNumber(inputNum);
+			//InputNumber(inputNum);
+			for (int i = 0; i < 3; i++) {
+				inputNum[i] = rand() % 10;
+			}
+			Sleep(100);
 			for (int i = 0; i < 3; i++) {
 				sendDoc[i].SetInt(inputNum[i]);
 			}
@@ -60,9 +64,9 @@ int main() {
 			send(hSocket, str, length, 0);
 			free(str);
 		}
-
 		memset(message, 0, sizeof(message));
 		recv(hSocket, message, sizeof(message) - 1, 0);
+		system("cls");
 		printResult.ReadJsonData(message,&clntTurn);
 	}
 	closesocket(hSocket);
@@ -78,7 +82,7 @@ void ErrorHandling(const char * errorMsg)
 	fputc('\n', stderr);
 }
 void InputNumber(int* num) {
-	cout << "숫자를 입력해주세요(0~9, 중복 가능)" << endl;
+	cout <<endl<<"숫자를 입력해주세요(0~9, 중복 가능)" << endl;
 	for (int i = 0; i < 3; i++) {
 		cin >> num[i];
 		if (cin.fail()) {
